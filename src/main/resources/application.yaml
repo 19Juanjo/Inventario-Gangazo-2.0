@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: InventarioGangazo2
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/inventarioGangazo
+    username: root
+    password: Admin123!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+server:
+  port: 9090
+
+security:
+  jwt:
+    secret-key: YEZDseseJbbyWixOgnZgYU9Lep6mYo6BWeoXbZwklBQ=
+    token-expiration: 600000
+
