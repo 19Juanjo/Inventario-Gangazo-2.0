@@ -18,5 +18,5 @@ public class ShoppingCart extends ShoppingCartItem{
     private Long id;
 
     @Column(name = "usuario_id")
-    private Long usuario_id;
+    private Users user;
 }
