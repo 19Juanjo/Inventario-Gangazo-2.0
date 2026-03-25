@@ -18,10 +18,10 @@ public class ShoppingCartItem {
     private Long id;
 
     @Column(name = "carrito_id")
-    private Long carrito_id;
+    private ShoppingCart shoppingCart;
     @Column(name = "producto_id")
-    private Long producto_id;
+    private Products product;
     @Column(name = "cantidad")
-    private Integer cantidad;
+    private Integer quantity;
     
 }
