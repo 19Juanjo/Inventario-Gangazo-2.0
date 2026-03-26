@@ -20,9 +20,9 @@ public class Order {
     private Long id;
     
     @Column(name = "usuario_id")
-    private Long usuario_id;
+    private Long users_id;
     @Column(name = "fecha")
-    private Timestamp fecha;
+    private Timestamp date;
     @Column(name = "total")
     private Double total;
 }

@@ -38,18 +38,18 @@ public class ProductsService {
 
             Products prod = productexist.get();
 
-            prod.setNombre(dto.getNombre());
-            prod.setDescripcion(dto.getDescripcion());
-            prod.setPrecio(dto.getPrecio());
+            prod.setName(dto.getNombre());
+            prod.setDescription(dto.getDescripcion());
+            prod.setPrice(dto.getPrecio());
             prod.setStock(dto.getStock());
 
             Products productUpdate = productsRepository.save(prod);
 
             ProductsResponseDTO response = new ProductsResponseDTO();
             response.setId(productUpdate.getId());
-            response.setNombre(productUpdate.getNombre());
-            response.setDescripcion(productUpdate.getDescripcion());
-            response.setPrecio(productUpdate.getPrecio());
+            response.setNombre(productUpdate.getName());
+            response.setDescripcion(productUpdate.getDescription());
+            response.setPrecio(productUpdate.getPrice());
             response.setStock(productUpdate.getStock());
 
             return Optional.of(response);

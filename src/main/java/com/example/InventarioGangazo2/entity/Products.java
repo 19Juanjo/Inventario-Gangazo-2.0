@@ -20,13 +20,13 @@ public class Products {
     private Long id;
 
     @Column(name = "nombre")
-    private String nombre;
+    private String name;
 
     @Column(name = "descripcion")
-    private String descripcion;
+    private String description;
 
     @Column(name = "precio")
-    private Double precio;
+    private Double price;
 
     @Column(name = "stock")
     private Integer stock;
