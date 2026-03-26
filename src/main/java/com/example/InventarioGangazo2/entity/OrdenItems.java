@@ -18,14 +18,14 @@ public class OrdenItems extends Products {
     private Long id;
 
     @Column(name = "pedido_id")
-    private Long pedidoId;
+    private Long orderId;
 
     @Column(name = "producto_id")
-    private Long productoId;
+    private Long productId;
 
     @Column(name = "cantidad")
-    private Integer cantidad;
+    private Integer Quantity;
 
     @Column(name = "precio")
-    private Double precio;
+    private Double price;
 }

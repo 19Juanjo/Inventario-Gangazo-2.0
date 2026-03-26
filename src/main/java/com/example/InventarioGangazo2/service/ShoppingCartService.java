@@ -121,12 +121,12 @@ public class ShoppingCartService {
 
         for (ShoppingCartItem item : items) {
 
-        double subtotal = item.getQuantity() * item.getProduct().getPrecio();
+        double subtotal = item.getQuantity() * item.getProduct().getPrice();
 
         responseItems.add(new ShoppingCartItemResponseDTO(
                 item.getProduct().getId(),
-                item.getProduct().getNombre(),
-                item.getProduct().getPrecio(),
+                item.getProduct().getName(),
+                item.getProduct().getPrice(),
                 item.getQuantity(),
                 subtotal
         ));

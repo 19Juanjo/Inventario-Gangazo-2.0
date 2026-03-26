@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.InventarioGangazo2.dto.OrdenItemsRequestDTO;
 import com.example.InventarioGangazo2.dto.OrdenItemsResponseDTO;
 import com.example.InventarioGangazo2.dto.OrderRequestDTO;
-import com.example.InventarioGangazo2.dto.OrderResponse;
+import com.example.InventarioGangazo2.dto.OrderResponseDTO;
 import com.example.InventarioGangazo2.entity.OrdenItems;
 import com.example.InventarioGangazo2.entity.Order;
 import com.example.InventarioGangazo2.entity.Products;
@@ -27,13 +27,13 @@ public class ShoppingService {
     private final OrderRepository orderRepository;
     private final ProductsRepository productsRepository;
 
-    public OrderResponse RealizarCompra(OrderRequestDTO request) {
+    public OrderResponseDTO Makepurchase(OrderRequestDTO request) {
 
         Order order = new Order();
-        order.setFecha(new Timestamp(System.currentTimeMillis()));
+        order.setDate(new Timestamp(System.currentTimeMillis()));
         order.setTotal(0.0);
 
-        order.setUsuario_id(request.getUserId());
+        order.setUsers_id(request.getUserId());
 
         order = orderRepository.save(order);
 
@@ -54,20 +54,20 @@ public class ShoppingService {
             productsRepository.save(product);
 
             OrdenItems orderItem = new OrdenItems();
-            orderItem.setPedidoId(order.getId());
-            orderItem.setProductoId(product.getId());
-            orderItem.setCantidad(item.getCantidad());
-            orderItem.setPrecio(product.getPrecio());
+            orderItem.setOrderId(order.getId());
+            orderItem.setProductId(product.getId());
+            orderItem.setQuantity(item.getCantidad());
+            orderItem.setPrice(product.getPrice());
 
             ordenItemsRepository.save(orderItem);
 
-            total += product.getPrecio() * item.getCantidad();
+            total += product.getPrice() * item.getCantidad();
 
             OrdenItemsResponseDTO itemResponse = new OrdenItemsResponseDTO();
             itemResponse.setProductId(product.getId());
-            itemResponse.setNombre(product.getNombre());
+            itemResponse.setNombre(product.getName());
             itemResponse.setCantidad(item.getCantidad());
-            itemResponse.setPrecio(product.getPrecio());
+            itemResponse.setPrecio(product.getPrice());
 
             itemsResponse.add(itemResponse); 
         }
@@ -75,20 +75,20 @@ public class ShoppingService {
         order.setTotal(total);
         orderRepository.save(order);
 
-        OrderResponse response = new OrderResponse();
+        OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
-        response.setFecha(order.getFecha());
+        response.setFecha(order.getDate());
         response.setTotal(order.getTotal());
         response.setItems(itemsResponse);
 
         return response;
     }
 
-    public List<OrderResponse> historial(Long userId) {
+    public List<OrderResponseDTO> Purchasehistory(Long userId) {
 
     List<Order> orders = orderRepository.findByUsuario_id(userId);
 
-    List<OrderResponse> responseList = new ArrayList<>();
+    List<OrderResponseDTO> responseList = new ArrayList<>();
 
     for (Order order : orders) {
 
@@ -98,21 +98,21 @@ public class ShoppingService {
 
         for (OrdenItems item : items) {
 
-            Products product = productsRepository.findById(item.getProductoId())
+            Products product = productsRepository.findById(item.getProductId())
                     .orElse(null);
 
             OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
-            dto.setProductId(item.getProductoId());
-            dto.setNombre(product != null ? product.getNombre() : "Sin nombre");
-            dto.setCantidad(item.getCantidad());
-            dto.setPrecio(item.getPrecio());
+            dto.setProductId(item.getProductId());
+            dto.setNombre(product != null ? product.getName() : "Sin nombre");
+            dto.setCantidad(item.getQuantity());
+            dto.setPrecio(item.getPrice());
 
             itemsResponse.add(dto);
         }
 
-        OrderResponse response = new OrderResponse();
+        OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
-        response.setFecha(order.getFecha());
+        response.setFecha(order.getDate());
         response.setTotal(order.getTotal());
         response.setItems(itemsResponse);
 
