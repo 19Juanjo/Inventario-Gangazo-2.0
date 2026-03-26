@@ -26,6 +26,12 @@ public class AuthService {
     public MessageResponseDTO register(RegisterRequestDTO request) {
         MessageResponseDTO response = new MessageResponseDTO();
 
+        if (request.getUsername() == null || request.getUsername().isBlank() ||
+            request.getEmail() == null || request.getEmail().isBlank() ||
+            request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new RuntimeException("Todos los campos son obligatorios");
+        }
+
         if (usersRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new RuntimeException("El username ya está en uso");
         }
@@ -44,12 +50,16 @@ public class AuthService {
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
-        LoginResponseDTO reponse = new LoginResponseDTO();
+
+        if (request.getUsername() == null || request.getUsername().isBlank() ||
+            request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new RuntimeException("Username y password son obligatorios");
+        }
+
         Optional<Users> user = usersRepository.findByUsername(request.getUsername());
 
-        if (user.isEmpty() && (request.getUsername() == null || request.getUsername().isBlank())) {
-            reponse.setMessage("Este usuario no se encuentra regstrado");
-            return reponse;
+        if (user.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado");
         }
 
         Users userFound = user.get();
@@ -58,18 +68,26 @@ public class AuthService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        String jwt = jwtService.generateToken(userFound.getId(), userFound.getUsername(), userFound.getRol_id());
+        String jwt = jwtService.generateToken(
+                userFound.getId(),
+                userFound.getUsername(),
+                userFound.getRol_id()
+        );
 
-        reponse.setMessage("Inicio de sesion exitoso");
-        reponse.setJwt(jwt);
-        return reponse;
+        LoginResponseDTO response = new LoginResponseDTO();
+        response.setMessage("Inicio de sesión exitoso");
+        response.setJwt(jwt);
+
+        return response;
     }
 
     public RefreshTokenResponseDTO refreshToken(String token) {
         String jwt = jwtService.refreshToken(token);
+
         RefreshTokenResponseDTO response = new RefreshTokenResponseDTO();
         response.setMessage("ok");
         response.setJwt(jwt);
+
         return response;
     }
 }

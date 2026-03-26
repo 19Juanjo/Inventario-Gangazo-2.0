@@ -26,44 +26,43 @@ public class AuthController {
         try {
             MessageResponseDTO response = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (RuntimeException e) {
+            MessageResponseDTO error = new MessageResponseDTO();
+            error.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request ){
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
         try {
             LoginResponseDTO response = authService.login(request);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-    } 
-    
-    @GetMapping("/refreshToken")
-    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(HttpServletRequest request) {
-        String autheader = request.getHeader("Authorization");
-        if (autheader == null || !autheader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        String token = autheader.substring(7);
-
-        RefreshTokenResponseDTO response = new RefreshTokenResponseDTO();
-
-        try {
-            response = authService.refreshToken(token);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (RuntimeException e) {
-            response.setMessage("Token expired");
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        } catch (Exception e) {
-            e.printStackTrace();
+            LoginResponseDTO error = new LoginResponseDTO();
+            error.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
+    @GetMapping("/refreshToken")
+    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(HttpServletRequest request) {
+
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        String token = authHeader.substring(7);
+
+        try {
+            RefreshTokenResponseDTO response = authService.refreshToken(token);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            RefreshTokenResponseDTO error = new RefreshTokenResponseDTO();
+            error.setMessage("Token inválido o expirado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
 }
