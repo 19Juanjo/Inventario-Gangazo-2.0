@@ -24,9 +24,9 @@ public class ProductsService {
 
     public Optional<Products> add(ProductsRequestDTO product) {
         Products p = new Products();
-        p.setNombre(product.getNombre());
-        p.setDescripcion(product.getDescripcion());
-        p.setPrecio(product.getPrecio());
+        p.setName(product.getNombre());
+        p.setDescription(product.getDescripcion());
+        p.setPrice(product.getPrecio());
         p.setStock(product.getStock());
         return Optional.of(productsRepository.save(p));
     }
@@ -69,9 +69,9 @@ public class ProductsService {
 
             ProductsResponseDTO response = new ProductsResponseDTO();
             response.setId(p.getId());
-            response.setNombre(p.getNombre());
-            response.setDescripcion(p.getDescripcion());
-            response.setPrecio(p.getPrecio());
+            response.setNombre(p.getName());
+            response.setDescripcion(p.getDescription());
+            response.setPrecio(p.getPrice());
             response.setStock(p.getStock());
 
             return Optional.of(response);
