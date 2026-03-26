@@ -1,5 +1,7 @@
 package com.example.InventarioGangazo2.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,35 +14,70 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.InventarioGangazo2.dto.ShoppingCartItemRequestDTO;
 import com.example.InventarioGangazo2.dto.ShoppingCartResponseDTO;
 import com.example.InventarioGangazo2.entity.Users;
+import com.example.InventarioGangazo2.repository.UsersRepository;
 import com.example.InventarioGangazo2.service.ShoppingCartService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/cart")
+@RequiredArgsConstructor
 public class ShoppingCartController {
-    private ShoppingCartService shoppingCartService;
+    private final ShoppingCartService shoppingCartService;
+    private final UsersRepository usersRepository;
 
-    @GetMapping
-    public ShoppingCartResponseDTO getCart(Users user){
-        return shoppingCartService.getCartByUser(user);
+    @GetMapping("/{userId}")
+    public ResponseEntity<ShoppingCartResponseDTO> getCart(@PathVariable Long userId){
+
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShoppingCartResponseDTO response = shoppingCartService.getCartByUser(user).orElseThrow();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     
-    @PostMapping
-    public ShoppingCartResponseDTO addProduct(@RequestBody Users user, @RequestBody ShoppingCartItemRequestDTO request) {
-        return shoppingCartService.addProduct(user, request);
+    @PostMapping("/{userId}")
+    public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Long userId,@RequestBody ShoppingCartItemRequestDTO request) {
+
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShoppingCartResponseDTO response = shoppingCartService.addProduct(user, request).orElseThrow();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping
-    public ShoppingCartResponseDTO updateProduct(@RequestBody Users user, @RequestBody ShoppingCartItemRequestDTO request) {
-        return shoppingCartService.updateCart(user, request);
+    @PutMapping("/{userId}")
+    public ResponseEntity<ShoppingCartResponseDTO> updateProduct(@PathVariable Long userId,@RequestBody ShoppingCartItemRequestDTO request) {
+
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShoppingCartResponseDTO response = shoppingCartService.updateCart(user, request).orElseThrow();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{productoId}")
-    public ShoppingCartResponseDTO removeProduct(@PathVariable Users user, @PathVariable Long productoId) {
-        return shoppingCartService.removeProduct(user, productoId);
+    @DeleteMapping("/{userId}/{productId}")
+    public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@PathVariable Long userId,@PathVariable Long productId) {
+
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShoppingCartResponseDTO response = shoppingCartService.removeProduct(user, productId).orElseThrow();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/clear")
-    public void clearCart(Users user) {
+    @DeleteMapping("/clear/{userId}")
+    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
+
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         shoppingCartService.clearCart(user);
+
+        return ResponseEntity.noContent().build();
     }
 }
