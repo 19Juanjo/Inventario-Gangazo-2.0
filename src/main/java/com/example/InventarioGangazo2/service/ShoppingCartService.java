@@ -2,6 +2,7 @@ package com.example.InventarioGangazo2.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class ShoppingCartService {
         private final ShoppingCartItemRepository shoppingCartItemRepository;
         private final ProductsRepository productsRepository;
 
-        public ShoppingCartResponseDTO getCartByUser(Users user) {
+        public Optional<ShoppingCartResponseDTO> getCartByUser(Users user) {
         ShoppingCart cart = shoppingCartRepository.findByUser(user)
                 .orElseGet(() -> {
                     ShoppingCart newCart = new ShoppingCart();
@@ -36,7 +37,7 @@ public class ShoppingCartService {
         return buildResponse(cart);
     }
 
-    public ShoppingCartResponseDTO addProduct(Users user, ShoppingCartItemRequestDTO request){
+    public Optional<ShoppingCartResponseDTO> addProduct(Users user, ShoppingCartItemRequestDTO request){
 
         ShoppingCart cart = shoppingCartRepository.findByUser(user).orElseGet(() -> {
             ShoppingCart newCart = new ShoppingCart();
@@ -63,7 +64,7 @@ public class ShoppingCartService {
         return buildResponse(cart);
     }
 
-    public ShoppingCartResponseDTO updateCart(Users user, ShoppingCartItemRequestDTO request){
+    public Optional<ShoppingCartResponseDTO> updateCart(Users user, ShoppingCartItemRequestDTO request){
 
         ShoppingCart cart = shoppingCartRepository.findByUser(user)
             .orElseThrow(() -> new RuntimeException("Cart no found"));
@@ -85,7 +86,7 @@ public class ShoppingCartService {
         return buildResponse(cart);
     }
 
-    public ShoppingCartResponseDTO removeProduct(Users user, Long producto_id){
+    public Optional<ShoppingCartResponseDTO> removeProduct(Users user, Long producto_id){
 
         ShoppingCart cart = shoppingCartRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("cart not found"));
@@ -105,12 +106,12 @@ public class ShoppingCartService {
     public void clearCart(Users user) {
 
         ShoppingCart cart = shoppingCartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Cart no found"));
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         shoppingCartItemRepository.deleteByShoppingCart(cart);
     }
 
-    private ShoppingCartResponseDTO buildResponse(ShoppingCart cart) {
+    private Optional<ShoppingCartResponseDTO> buildResponse(ShoppingCart cart) {
 
         List<ShoppingCartItem> items = shoppingCartItemRepository.findByShoppingCart(cart);
 
@@ -133,6 +134,6 @@ public class ShoppingCartService {
         total += subtotal;
     }
 
-    return new ShoppingCartResponseDTO(cart.getId(), responseItems, total);
+    return Optional.of(new ShoppingCartResponseDTO(cart.getId(), responseItems, total));
     }
 }

@@ -23,7 +23,12 @@ public class ProductsService {
     }
 
     public Optional<Products> add(ProductsRequestDTO product) {
-        return productsRepository.save(product);
+        Products p = new Products();
+        p.setNombre(product.getNombre());
+        p.setDescripcion(product.getDescripcion());
+        p.setPrecio(product.getPrecio());
+        p.setStock(product.getStock());
+        return Optional.of(productsRepository.save(p));
     }
 
     public void delete(Long id) {
@@ -31,11 +36,9 @@ public class ProductsService {
     }
 
     public Optional<ProductsResponseDTO> update(Long id, ProductsRequestDTO dto) {
-
         Optional<Products> productexist = productsRepository.findById(id);
 
         if (productexist.isPresent()) {
-
             Products prod = productexist.get();
 
             prod.setName(dto.getNombre());
@@ -51,6 +54,25 @@ public class ProductsService {
             response.setDescripcion(productUpdate.getDescription());
             response.setPrecio(productUpdate.getPrice());
             response.setStock(productUpdate.getStock());
+
+            return Optional.of(response);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<ProductsResponseDTO> getById(Long id) {
+        Optional<Products> product = productsRepository.findById(id);
+
+        if (product.isPresent()) {
+            Products p = product.get();
+
+            ProductsResponseDTO response = new ProductsResponseDTO();
+            response.setId(p.getId());
+            response.setNombre(p.getNombre());
+            response.setDescripcion(p.getDescripcion());
+            response.setPrecio(p.getPrecio());
+            response.setStock(p.getStock());
 
             return Optional.of(response);
         }
