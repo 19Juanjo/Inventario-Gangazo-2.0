@@ -10,6 +10,7 @@ import com.example.InventarioGangazo2.dto.LoginResponseDTO;
 import com.example.InventarioGangazo2.dto.MessageResponseDTO;
 import com.example.InventarioGangazo2.dto.RefreshTokenResponseDTO;
 import com.example.InventarioGangazo2.dto.RegisterRequestDTO;
+import com.example.InventarioGangazo2.entity.RolType;
 import com.example.InventarioGangazo2.entity.Users;
 import com.example.InventarioGangazo2.repository.UsersRepository;
 
@@ -40,8 +41,7 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        user.setRol_id(2L);
+        user.setRol_id(RolType.CLIENTE.getId());
 
         usersRepository.save(user);
 
