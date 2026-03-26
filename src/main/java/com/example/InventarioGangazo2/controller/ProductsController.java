@@ -23,8 +23,28 @@ public class ProductsController {
     private final ProductsService productsService;
 
     @GetMapping
-    public List<Products> listar() {
-        return productsService.listar();
+    public ResponseEntity<?> listar(HttpServletRequest request) {
+        Long rolId = (Long) request.getAttribute("rolId");
+
+        if (rolId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autorizado");
+        }
+
+        List<Products> productos = productsService.listar();
+        return ResponseEntity.ok(productos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detalle(HttpServletRequest request, @PathVariable Long id) {
+        Long rolId = (Long) request.getAttribute("rolId");
+
+        if (rolId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autorizado");
+        }
+
+        return productsService.getById(id)
+            .map(product -> ResponseEntity.ok(product))
+            .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
