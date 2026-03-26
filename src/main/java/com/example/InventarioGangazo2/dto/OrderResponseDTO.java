@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class OrderResponse {
+public class OrderResponseDTO {
     private Long id;
     private Timestamp fecha;
     private Double total;
