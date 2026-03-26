@@ -1,18 +1,12 @@
 package com.example.InventarioGangazo2.controller;
 
 import java.util.List;
-import java.util.Optional;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.InventarioGangazo2.dto.ProductsRequestDTO;
 import com.example.InventarioGangazo2.dto.ProductsResponseDTO;
@@ -25,30 +19,51 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductsController {
+
     private final ProductsService productsService;
 
     @GetMapping
     public List<Products> listar() {
         return productsService.listar();
-    } 
+    }
 
     @PostMapping
-    public Optional<Products> create(@RequestBody ProductsRequestDTO product) {
-        return productsService.add(product);
+    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody ProductsRequestDTO product) {
+        Long rolId = (Long) request.getAttribute("rolId");
+
+        if (rolId == null || rolId != 1L) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado");
+        }
+
+        return ResponseEntity.ok(productsService.add(product));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductsResponseDTO> update(@PathVariable Long id, @RequestBody ProductsRequestDTO productsRequestDTO){
+    public ResponseEntity<ProductsResponseDTO> update(HttpServletRequest request, @PathVariable Long id, @RequestBody ProductsRequestDTO productsRequestDTO) {
+        Long rolId = (Long) request.getAttribute("rolId");
+
+        if (rolId == null || rolId != 1L) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
         ProductsResponseDTO response = productsService.update(id, productsRequestDTO).orElse(null);
-        if(response != null) {
+
+        if (response != null) {
             return ResponseEntity.status(HttpStatus.OK).body(response);
-        }else{
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     @DeleteMapping("/{id}")
-    public Products delete(@PathVariable Long id) {
-        return delete(id);
+    public ResponseEntity<?> delete(HttpServletRequest request, @PathVariable Long id) {
+        Long rolId = (Long) request.getAttribute("rolId");
+
+        if (rolId == null || rolId != 1L) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado");
+        }
+
+        productsService.delete(id);
+        return ResponseEntity.ok("Producto eliminado");
     }
 }
