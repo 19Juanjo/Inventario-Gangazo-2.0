@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.example.InventarioGangazo2.dto.OrdenItemsRequestDTO;
@@ -119,6 +118,45 @@ public class ShoppingService {
         responseList.add(response);
     }
 
+        return responseList;
+    }
+
+    public List<OrderResponseDTO> getAllOrders() {
+
+    List<Order> orders = orderRepository.findAll();
+
+    List<OrderResponseDTO> responseList = new ArrayList<>();
+
+    for (Order order : orders) {
+
+        List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
+
+        List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
+
+        for (OrdenItems item : items) {
+
+            Products product = productsRepository.findById(item.getProductId())
+                    .orElse(null);
+
+            OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
+            dto.setProductId(item.getProductId());
+            dto.setNombre(product != null ? product.getName() : "Sin nombre");
+            dto.setCantidad(item.getQuantity());
+            dto.setPrecio(item.getPrice());
+
+            itemsResponse.add(dto);
+        }
+
+        OrderResponseDTO response = new OrderResponseDTO();
+        response.setId(order.getId());
+        response.setFecha(order.getDate());
+        response.setTotal(order.getTotal());
+        response.setItems(itemsResponse);
+
+        responseList.add(response);
+    }
+
     return responseList;
 }
+
 }
