@@ -34,4 +34,10 @@ public class OrderController {
         List<OrderResponseDTO> response = shoppingService.Purchasehistory(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
+        List<OrderResponseDTO> response = shoppingService.getAllOrders();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
