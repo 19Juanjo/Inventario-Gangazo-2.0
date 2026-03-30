@@ -43,30 +43,30 @@ public class ShoppingService {
         for (OrdenItemsRequestDTO item : request.getItems()) {
 
             Products product = productsRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Producto No Encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Product Not Found"));
 
-            if (product.getStock() < item.getCantidad()) {
-                throw new RuntimeException("Stock insuficiente");
+            if (product.getStock() < item.getQuantity()) {
+                throw new RuntimeException("Stock insuficient");
             }
 
-            product.setStock(product.getStock() - item.getCantidad());
+            product.setStock(product.getStock() - item.getQuantity());
             productsRepository.save(product);
 
             OrdenItems orderItem = new OrdenItems();
             orderItem.setOrderId(order.getId());
             orderItem.setProductId(product.getId());
-            orderItem.setQuantity(item.getCantidad());
+            orderItem.setQuantity(item.getQuantity());
             orderItem.setPrice(product.getPrice());
 
             ordenItemsRepository.save(orderItem);
 
-            total += product.getPrice() * item.getCantidad();
+            total += product.getPrice() * item.getQuantity();
 
             OrdenItemsResponseDTO itemResponse = new OrdenItemsResponseDTO();
             itemResponse.setProductId(product.getId());
-            itemResponse.setNombre(product.getName());
-            itemResponse.setCantidad(item.getCantidad());
-            itemResponse.setPrecio(product.getPrice());
+            itemResponse.setName(product.getName());
+            itemResponse.setQuantity(item.getQuantity());
+            itemResponse.setPrice(product.getPrice());
 
             itemsResponse.add(itemResponse); 
         }
@@ -76,7 +76,7 @@ public class ShoppingService {
 
         OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
-        response.setFecha(order.getDate());
+        response.setDate(order.getDate());
         response.setTotal(order.getTotal());
         response.setItems(itemsResponse);
 
@@ -102,16 +102,16 @@ public class ShoppingService {
 
             OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
             dto.setProductId(item.getProductId());
-            dto.setNombre(product != null ? product.getName() : "Sin nombre");
-            dto.setCantidad(item.getQuantity());
-            dto.setPrecio(item.getPrice());
+            dto.setName(product != null ? product.getName() : "without name");
+            dto.setQuantity(item.getQuantity());
+            dto.setPrice(item.getPrice());
 
             itemsResponse.add(dto);
         }
 
         OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
-        response.setFecha(order.getDate());
+        response.setDate(order.getDate());
         response.setTotal(order.getTotal());
         response.setItems(itemsResponse);
 
@@ -140,16 +140,16 @@ public class ShoppingService {
 
             OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
             dto.setProductId(item.getProductId());
-            dto.setNombre(product != null ? product.getName() : "Sin nombre");
-            dto.setCantidad(item.getQuantity());
-            dto.setPrecio(item.getPrice());
+            dto.setName(product != null ? product.getName() : "without name");
+            dto.setQuantity(item.getQuantity());
+            dto.setPrice(item.getPrice());
 
             itemsResponse.add(dto);
         }
 
         OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
-        response.setFecha(order.getDate());
+        response.setDate(order.getDate());
         response.setTotal(order.getTotal());
         response.setItems(itemsResponse);
 
