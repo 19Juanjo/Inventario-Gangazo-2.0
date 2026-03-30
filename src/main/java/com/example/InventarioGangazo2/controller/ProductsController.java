@@ -1,6 +1,7 @@
 package com.example.InventarioGangazo2.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.InventarioGangazo2.dto.MessageResponseDTO;
 import com.example.InventarioGangazo2.dto.ProductsRequestDTO;
 import com.example.InventarioGangazo2.dto.ProductsResponseDTO;
 import com.example.InventarioGangazo2.entity.Products;
@@ -23,67 +25,33 @@ public class ProductsController {
     private final ProductsService productsService;
 
     @GetMapping
-    public ResponseEntity<?> listar(HttpServletRequest request) {
-        Long rolId = (Long) request.getAttribute("rolId");
-
-        if (rolId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autorizado");
-        }
-
-        List<Products> productos = productsService.listar();
-        return ResponseEntity.ok(productos);
+    public ResponseEntity<List<ProductsResponseDTO>> AllProducts() {
+        return ResponseEntity.ok(productsService.AllProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> detalle(HttpServletRequest request, @PathVariable Long id) {
-        Long rolId = (Long) request.getAttribute("rolId");
-
-        if (rolId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autorizado");
-        }
-
-        return productsService.getById(id)
-            .map(product -> ResponseEntity.ok(product))
-            .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<Optional<ProductsResponseDTO>> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(productsService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody ProductsRequestDTO product) {
-        Long rolId = (Long) request.getAttribute("rolId");
-
-        if (rolId == null || rolId != 1L) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado");
-        }
-
-        return ResponseEntity.ok(productsService.add(product));
+    public ResponseEntity<Optional<Products>> create(@RequestBody ProductsRequestDTO product) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productsService.add(product));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductsResponseDTO> update(HttpServletRequest request, @PathVariable Long id, @RequestBody ProductsRequestDTO productsRequestDTO) {
-        Long rolId = (Long) request.getAttribute("rolId");
-
-        if (rolId == null || rolId != 1L) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
-        ProductsResponseDTO response = productsService.update(id, productsRequestDTO).orElse(null);
-
-        if (response != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<Optional<ProductsResponseDTO>> update(@PathVariable Long id,@RequestBody ProductsRequestDTO dto) {
+        return ResponseEntity.ok(productsService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(HttpServletRequest request, @PathVariable Long id) {
-        Long rolId = (Long) request.getAttribute("rolId");
-
-        if (rolId == null || rolId != 1L) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado");
-        }
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id) {
 
         productsService.delete(id);
-        return ResponseEntity.ok("Producto eliminado");
+
+        MessageResponseDTO response = new MessageResponseDTO();
+        response.setMessage("Product delete correctly");
+
+        return ResponseEntity.ok(response);
     }
 }

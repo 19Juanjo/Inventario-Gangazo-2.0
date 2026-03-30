@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class OrderResponseDTO {
     private Long id;
-    private Timestamp fecha;
+    private Timestamp date;
     private Double total;
     private List<OrdenItemsResponseDTO> items;
 }
