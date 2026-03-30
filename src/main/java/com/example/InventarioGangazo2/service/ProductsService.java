@@ -18,15 +18,26 @@ public class ProductsService {
 
     private final ProductsRepository productsRepository;
 
-    public List<Products> listar() {
-        return productsRepository.findAll();
+    public List<ProductsResponseDTO> AllProducts() {
+        return productsRepository.findAll()
+            .stream()
+            .map(p -> {
+                ProductsResponseDTO dto = new ProductsResponseDTO();
+                dto.setId(p.getId());
+                dto.setNombre(p.getName());
+                dto.setDescripcion(p.getDescription());
+                dto.setPrecio(p.getPrice());
+                dto.setStock(p.getStock());
+                return dto;
+            })
+            .toList();
     }
 
     public Optional<Products> add(ProductsRequestDTO product) {
         Products p = new Products();
-        p.setName(product.getNombre());
-        p.setDescription(product.getDescripcion());
-        p.setPrice(product.getPrecio());
+        p.setName(product.getName());
+        p.setDescription(product.getDescription());
+        p.setPrice(product.getPrice());
         p.setStock(product.getStock());
         return Optional.of(productsRepository.save(p));
     }
@@ -41,9 +52,9 @@ public class ProductsService {
         if (productexist.isPresent()) {
             Products prod = productexist.get();
 
-            prod.setName(dto.getNombre());
-            prod.setDescription(dto.getDescripcion());
-            prod.setPrice(dto.getPrecio());
+            prod.setName(dto.getName());
+            prod.setDescription(dto.getDescription());
+            prod.setPrice(dto.getPrice());
             prod.setStock(dto.getStock());
 
             Products productUpdate = productsRepository.save(prod);

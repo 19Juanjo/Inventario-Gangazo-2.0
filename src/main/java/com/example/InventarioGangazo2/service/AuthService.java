@@ -30,11 +30,11 @@ public class AuthService {
         if (request.getUsername() == null || request.getUsername().isBlank() ||
             request.getEmail() == null || request.getEmail().isBlank() ||
             request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new RuntimeException("Todos los campos son obligatorios");
+            throw new RuntimeException("All fields are required");
         }
 
         if (usersRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("El username ya está en uso");
+            throw new RuntimeException("The username is already in use");
         }
 
         Users user = new Users();
@@ -45,7 +45,7 @@ public class AuthService {
 
         usersRepository.save(user);
 
-        response.setMessage("Usuario registrado exitosamente");
+        response.setMessage("User successfully registered");
         return response;
     }
 
@@ -53,19 +53,19 @@ public class AuthService {
 
         if (request.getUsername() == null || request.getUsername().isBlank() ||
             request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new RuntimeException("Username y password son obligatorios");
+            throw new RuntimeException("Username and password are required");
         }
 
         Optional<Users> user = usersRepository.findByUsername(request.getUsername());
 
         if (user.isEmpty()) {
-            throw new RuntimeException("Usuario no encontrado");
+            throw new RuntimeException("User not found");
         }
 
         Users userFound = user.get();
 
         if (!passwordEncoder.matches(request.getPassword(), userFound.getPassword())) {
-            throw new RuntimeException("Contraseña incorrecta");
+            throw new RuntimeException("password incorrect");
         }
 
         String jwt = jwtService.generateToken(
@@ -75,7 +75,7 @@ public class AuthService {
         );
 
         LoginResponseDTO response = new LoginResponseDTO();
-        response.setMessage("Inicio de sesión exitoso");
+        response.setMessage("Login successful");
         response.setJwt(jwt);
 
         return response;

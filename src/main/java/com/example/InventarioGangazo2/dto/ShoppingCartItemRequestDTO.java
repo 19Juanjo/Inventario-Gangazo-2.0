@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class ShoppingCartItemRequestDTO {
     private Long productId;
-    private Integer cantidad;
+    private Integer Quantity;
 }

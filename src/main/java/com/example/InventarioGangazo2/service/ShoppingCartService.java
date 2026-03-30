@@ -56,7 +56,7 @@ public class ShoppingCartService {
 
         item.setProduct(product);
 
-        item.setQuantity(item.getQuantity() == null ? request.getCantidad() : item.getQuantity() + request.getCantidad()
+        item.setQuantity(item.getQuantity() == null ? request.getQuantity() : item.getQuantity() + request.getQuantity()
         );
 
         shoppingCartItemRepository.save(item);
@@ -76,10 +76,10 @@ public class ShoppingCartService {
             .findByShoppingCartAndProduct(cart, products)
             .orElseThrow(() -> new RuntimeException("Product not in cart"));
 
-        if(request.getCantidad() <= 0){
+        if(request.getQuantity() <= 0){
             shoppingCartItemRepository.delete(item);
         }else{
-            item.setQuantity(request.getCantidad());
+            item.setQuantity(request.getQuantity());
             shoppingCartItemRepository.save(item);   
         }
 
