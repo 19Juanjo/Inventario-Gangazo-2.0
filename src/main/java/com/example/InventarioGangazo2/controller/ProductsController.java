@@ -13,6 +13,7 @@ import com.example.InventarioGangazo2.dto.ProductsResponseDTO;
 import com.example.InventarioGangazo2.entity.Products;
 import com.example.InventarioGangazo2.service.ProductsService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,7 +36,7 @@ public class ProductsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<ProductsResponseDTO>> getById(@PathVariable Long id) {
+    public ResponseEntity<Optional<ProductsResponseDTO>> getById(@Valid @PathVariable Long id) {
 
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
@@ -45,7 +46,7 @@ public class ProductsController {
     }
 
     @PostMapping
-    public ResponseEntity<Optional<Products>> create(@RequestBody ProductsRequestDTO product) {
+    public ResponseEntity<Optional<Products>> create(@Valid @RequestBody ProductsRequestDTO product) {
 
         if (product == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
@@ -67,7 +68,7 @@ public class ProductsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Optional<ProductsResponseDTO>> update(@PathVariable Long id,@RequestBody ProductsRequestDTO dto) {
+    public ResponseEntity<Optional<ProductsResponseDTO>> update(@Valid @PathVariable Long id,@RequestBody ProductsRequestDTO dto) {
 
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
@@ -85,7 +86,7 @@ public class ProductsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<MessageResponseDTO> delete(@Valid @PathVariable Long id) {
 
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Invalid ID"));
