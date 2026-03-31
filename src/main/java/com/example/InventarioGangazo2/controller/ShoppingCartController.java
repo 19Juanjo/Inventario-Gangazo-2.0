@@ -2,14 +2,7 @@ package com.example.InventarioGangazo2.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.InventarioGangazo2.dto.ShoppingCartItemRequestDTO;
 import com.example.InventarioGangazo2.dto.ShoppingCartResponseDTO;
@@ -29,8 +22,11 @@ public class ShoppingCartController {
     @GetMapping("/{userId}")
     public ResponseEntity<ShoppingCartResponseDTO> getCart(@PathVariable Long userId){
 
-        Users user = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         ShoppingCartResponseDTO response = shoppingCartService.getCartByUser(user).orElseThrow();
 
@@ -38,10 +34,25 @@ public class ShoppingCartController {
     }
     
     @PostMapping("/{userId}")
-    public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Long userId,@RequestBody ShoppingCartItemRequestDTO request) {
+    public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Long userId, @RequestBody ShoppingCartItemRequestDTO request) {
 
-        Users user = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request.getProductId() == null || request.getProductId() <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request.getQuantity() == null || request.getQuantity() <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         ShoppingCartResponseDTO response = shoppingCartService.addProduct(user, request).orElseThrow();
 
@@ -51,8 +62,23 @@ public class ShoppingCartController {
     @PutMapping("/{userId}")
     public ResponseEntity<ShoppingCartResponseDTO> updateProduct(@PathVariable Long userId,@RequestBody ShoppingCartItemRequestDTO request) {
 
-        Users user = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request.getProductId() == null || request.getProductId() <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request.getQuantity() == null || request.getQuantity() <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         ShoppingCartResponseDTO response = shoppingCartService.updateCart(user, request).orElseThrow();
 
@@ -62,8 +88,15 @@ public class ShoppingCartController {
     @DeleteMapping("/{userId}/{productId}")
     public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@PathVariable Long userId,@PathVariable Long productId) {
 
-        Users user = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (productId == null || productId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         ShoppingCartResponseDTO response = shoppingCartService.removeProduct(user, productId).orElseThrow();
 
@@ -73,8 +106,11 @@ public class ShoppingCartController {
     @DeleteMapping("/clear/{userId}")
     public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
 
-        Users user = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         shoppingCartService.clearCart(user);
 

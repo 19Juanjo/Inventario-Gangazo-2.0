@@ -14,4 +14,3 @@ public class OrderRequestDTO {
     @NotEmpty(message = "There must be at least one product in the order")
     private List<@Valid OrdenItemsRequestDTO> items;
 }
-
