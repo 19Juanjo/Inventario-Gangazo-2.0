@@ -1,12 +1,15 @@
 package com.example.InventarioGangazo2.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class LoginRequestDTO {
-    @NotBlank(message = "The username is required")
+    @NotBlank(message = "El username es obligatorio")
+    @Size(min = 4, max = 50, message = "El username debe tener entre 4 y 50 caracteres")
     private String username;
-    @NotBlank(message = "The password is required")
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 6, message = "La contraseña debe tener mínimo 6 caracteres")
     private String password;
 }
