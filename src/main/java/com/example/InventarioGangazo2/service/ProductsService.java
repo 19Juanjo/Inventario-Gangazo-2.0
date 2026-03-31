@@ -34,22 +34,59 @@ public class ProductsService {
     }
 
     public Optional<Products> add(ProductsRequestDTO product) {
+
+        if (product.getName() == null || product.getName().isBlank()) {
+            throw new RuntimeException("the name is required");
+        }
+        if (product.getDescription() == null || product.getDescription().isBlank()) {
+            throw new RuntimeException("the description is required");
+        }
+        if (product.getPrice() == null || product.getPrice() <= 0) {
+            throw new RuntimeException("the price must be greater than 0");
+        }
+        if (product.getStock() == null || product.getStock() < 0) {
+            throw new RuntimeException("the stock not it can be negative");
+        }
+
         Products p = new Products();
         p.setName(product.getName());
         p.setDescription(product.getDescription());
         p.setPrice(product.getPrice());
         p.setStock(product.getStock());
+
         return Optional.of(productsRepository.save(p));
     }
 
     public void delete(Long id) {
+        if (id == null) {
+            throw new RuntimeException("the id is required");
+        }
+        if (!productsRepository.existsById(id)) {
+            throw new RuntimeException("the product not exist");
+        }
         productsRepository.deleteById(id);
     }
 
     public Optional<ProductsResponseDTO> update(Long id, ProductsRequestDTO dto) {
+        if (id == null) {
+            throw new RuntimeException("the id is required");
+        }
         Optional<Products> productexist = productsRepository.findById(id);
 
         if (productexist.isPresent()) {
+            if (dto.getName() == null || dto.getName().isBlank()) {
+                throw new RuntimeException("the name is required");
+            }
+            if (dto.getDescription() == null || dto.getDescription().isBlank()) {
+                throw new RuntimeException("the descripción is required");
+            }
+            if (dto.getPrice() == null || dto.getPrice() <= 0) {
+                throw new RuntimeException("the precio must be greater than 0");
+            }
+            if (dto.getStock() == null || dto.getStock() < 0) {
+                throw new RuntimeException("the stock not it can be negative");
+            }
+
             Products prod = productexist.get();
 
             prod.setName(dto.getName());
@@ -68,13 +105,14 @@ public class ProductsService {
 
             return Optional.of(response);
         }
-
         return Optional.empty();
     }
 
     public Optional<ProductsResponseDTO> getById(Long id) {
+        if (id == null) {
+            throw new RuntimeException("the id is required");
+        }
         Optional<Products> product = productsRepository.findById(id);
-
         if (product.isPresent()) {
             Products p = product.get();
 
@@ -87,7 +125,6 @@ public class ProductsService {
 
             return Optional.of(response);
         }
-
         return Optional.empty();
     }
 }

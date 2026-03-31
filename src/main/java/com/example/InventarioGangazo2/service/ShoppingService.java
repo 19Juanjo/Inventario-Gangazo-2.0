@@ -26,27 +26,36 @@ public class ShoppingService {
     private final OrderRepository orderRepository;
     private final ProductsRepository productsRepository;
 
-    public OrderResponseDTO Makepurchase(OrderRequestDTO request) {
+     public OrderResponseDTO Makepurchase(OrderRequestDTO request) {
+        if (request.getUserId() == null) {
+            throw new RuntimeException("User is required");
+        }
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new RuntimeException("Order must contain at least one item");
+        }
 
         Order order = new Order();
         order.setDate(new Timestamp(System.currentTimeMillis()));
         order.setTotal(0.0);
-
         order.setUsers_id(request.getUserId());
 
         order = orderRepository.save(order);
 
         double total = 0;   
-
         List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
 
         for (OrdenItemsRequestDTO item : request.getItems()) {
-
+            if (item.getProductId() == null) {
+                throw new RuntimeException("Product is required");
+            }
+            if (item.getQuantity() <= 0) {
+                throw new RuntimeException("Quantity must be greater than 0");
+            }
             Products product = productsRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product Not Found"));
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
 
             if (product.getStock() < item.getQuantity()) {
-                throw new RuntimeException("Stock insuficient");
+                throw new RuntimeException("Insufficient stock");
             }
 
             product.setStock(product.getStock() - item.getQuantity());
@@ -84,79 +93,69 @@ public class ShoppingService {
     }
 
     public List<OrderResponseDTO> Purchasehistory(Long userId) {
-
-    List<Order> orders = orderRepository.findByUsuario_id(userId);
-
-    List<OrderResponseDTO> responseList = new ArrayList<>();
-
-    for (Order order : orders) {
-
-        List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
-
-        List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
-
-        for (OrdenItems item : items) {
-
-            Products product = productsRepository.findById(item.getProductId())
-                    .orElse(null);
-
-            OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
-            dto.setProductId(item.getProductId());
-            dto.setName(product != null ? product.getName() : "without name");
-            dto.setQuantity(item.getQuantity());
-            dto.setPrice(item.getPrice());
-
-            itemsResponse.add(dto);
+        if (userId == null) {
+            throw new RuntimeException("User is required");
         }
+        List<Order> orders = orderRepository.findByUsuario_id(userId);
+        List<OrderResponseDTO> responseList = new ArrayList<>();
 
-        OrderResponseDTO response = new OrderResponseDTO();
-        response.setId(order.getId());
-        response.setDate(order.getDate());
-        response.setTotal(order.getTotal());
-        response.setItems(itemsResponse);
+        for (Order order : orders) {
+            List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
+            List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
+            for (OrdenItems item : items) {
 
-        responseList.add(response);
-    }
+                Products product = productsRepository.findById(item.getProductId())
+                        .orElse(null);
 
+                OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
+                dto.setProductId(item.getProductId());
+                dto.setName(product != null ? product.getName() : "without name");
+                dto.setQuantity(item.getQuantity());
+                dto.setPrice(item.getPrice());
+
+                itemsResponse.add(dto);
+            }
+            OrderResponseDTO response = new OrderResponseDTO();
+            response.setId(order.getId());
+            response.setDate(order.getDate());
+            response.setTotal(order.getTotal());
+            response.setItems(itemsResponse);
+
+            responseList.add(response);
+        }
         return responseList;
     }
 
     public List<OrderResponseDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        List<OrderResponseDTO> responseList = new ArrayList<>();
 
-    List<Order> orders = orderRepository.findAll();
+        for (Order order : orders) {
 
-    List<OrderResponseDTO> responseList = new ArrayList<>();
+            List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
+            List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
+            for (OrdenItems item : items) {
 
-    for (Order order : orders) {
+                Products product = productsRepository.findById(item.getProductId())
+                        .orElse(null);
 
-        List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
+                OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
+                dto.setProductId(item.getProductId());
+                dto.setName(product != null ? product.getName() : "without name");
+                dto.setQuantity(item.getQuantity());
+                dto.setPrice(item.getPrice());
 
-        List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
+                itemsResponse.add(dto);
+            }
+            OrderResponseDTO response = new OrderResponseDTO();
+            response.setId(order.getId());
+            response.setDate(order.getDate());
+            response.setTotal(order.getTotal());
+            response.setItems(itemsResponse);
 
-        for (OrdenItems item : items) {
-
-            Products product = productsRepository.findById(item.getProductId())
-                    .orElse(null);
-
-            OrdenItemsResponseDTO dto = new OrdenItemsResponseDTO();
-            dto.setProductId(item.getProductId());
-            dto.setName(product != null ? product.getName() : "without name");
-            dto.setQuantity(item.getQuantity());
-            dto.setPrice(item.getPrice());
-
-            itemsResponse.add(dto);
+            responseList.add(response);
         }
-
-        OrderResponseDTO response = new OrderResponseDTO();
-        response.setId(order.getId());
-        response.setDate(order.getDate());
-        response.setTotal(order.getTotal());
-        response.setItems(itemsResponse);
-
-        responseList.add(response);
+        return responseList;
     }
-
-    return responseList;
-}
 
 }
