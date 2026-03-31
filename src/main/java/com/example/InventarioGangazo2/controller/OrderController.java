@@ -25,19 +25,43 @@ public class OrderController {
 
     @PostMapping("/buy")
     public ResponseEntity<OrderResponseDTO> buy(@RequestBody OrderRequestDTO request) {
+
+        if (request == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request.getUserId() == null || request.getUserId() <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
         OrderResponseDTO response = shoppingService.Makepurchase(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<OrderResponseDTO>> Purchasehistory(@PathVariable Long userId) {
+
+        if (userId == null || userId <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
         List<OrderResponseDTO> response = shoppingService.Purchasehistory(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/admin")
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders() {
+
         List<OrderResponseDTO> response = shoppingService.getAllOrders();
+
+        if (response == null || response.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

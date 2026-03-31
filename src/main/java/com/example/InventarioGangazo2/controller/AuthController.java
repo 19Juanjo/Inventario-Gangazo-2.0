@@ -23,6 +23,23 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<MessageResponseDTO> register(@RequestBody RegisterRequestDTO request) {
+
+        if (request == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Empty request"));
+        }
+
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("The username is required."));
+        }
+
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Email is required"));
+        }
+
+        if (request.getPassword() == null || request.getPassword().length() < 6) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("The password must be at least 6 characters long"));
+        }
+
         try {
             MessageResponseDTO response = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -35,6 +52,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+
+        if (request == null) {
+            LoginResponseDTO error = new LoginResponseDTO();
+            error.setMessage("Request vacío");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            LoginResponseDTO error = new LoginResponseDTO();
+            error.setMessage("El username es obligatorio");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            LoginResponseDTO error = new LoginResponseDTO();
+            error.setMessage("La contraseña es obligatoria");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
         try {
             LoginResponseDTO response = authService.login(request);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -50,18 +86,26 @@ public class AuthController {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || authHeader.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (!authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         String token = authHeader.substring(7);
+
+        if (token == null || token.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
 
         try {
             RefreshTokenResponseDTO response = authService.refreshToken(token);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             RefreshTokenResponseDTO error = new RefreshTokenResponseDTO();
-            error.setMessage("Token inválido o expirado");
+            error.setMessage("Invalid or expired token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
