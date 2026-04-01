@@ -56,19 +56,19 @@ public class AuthController {
 
         if (request == null) {
             LoginResponseDTO error = new LoginResponseDTO();
-            error.setMessage("Request vacío");
+            error.setMessage("Request empty");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
         if (request.getUsername() == null || request.getUsername().isBlank()) {
             LoginResponseDTO error = new LoginResponseDTO();
-            error.setMessage("El username es obligatorio");
+            error.setMessage("the username is required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             LoginResponseDTO error = new LoginResponseDTO();
-            error.setMessage("La contraseña es obligatoria");
+            error.setMessage("the password is required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 
