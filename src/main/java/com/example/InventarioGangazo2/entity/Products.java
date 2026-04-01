@@ -10,22 +10,17 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "Products")
+@Table(name = "productos")
 public class Products {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
     @Column(name = "nombre")
     private String name;
-
     @Column(name = "descripcion")
     private String description;
-
     @Column(name = "precio")
     private Double price;
-
     @Column(name = "stock")
     private Integer stock;
 }

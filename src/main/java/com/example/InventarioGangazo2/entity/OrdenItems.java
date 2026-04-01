@@ -10,22 +10,17 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "Pedido_items")
-public class OrdenItems extends Products {
+@Table(name = "pedido_items")
+public class OrdenItems {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
     @Column(name = "pedido_id")
     private Long orderId;
-
     @Column(name = "producto_id")
     private Long productId;
-
     @Column(name = "cantidad")
-    private Integer Quantity;
-
+    private Integer quantity;
     @Column(name = "precio")
     private Double price;
 }

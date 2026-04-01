@@ -37,7 +37,7 @@ public class ShoppingService {
         Order order = new Order();
         order.setDate(new Timestamp(System.currentTimeMillis()));
         order.setTotal(0.0);
-        order.setUsers_id(request.getUserId());
+        order.setUserId(request.getUserId());
 
         order = orderRepository.save(order);
 
@@ -96,11 +96,11 @@ public class ShoppingService {
         if (userId == null) {
             throw new RuntimeException("User is required");
         }
-        List<Order> orders = orderRepository.findByUsuario_id(userId);
+        List<Order> orders = orderRepository.findByUserId(userId);
         List<OrderResponseDTO> responseList = new ArrayList<>();
 
         for (Order order : orders) {
-            List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
+            List<OrdenItems> items = ordenItemsRepository.findByOrderId(order.getId());
             List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
             for (OrdenItems item : items) {
 
@@ -132,7 +132,7 @@ public class ShoppingService {
 
         for (Order order : orders) {
 
-            List<OrdenItems> items = ordenItemsRepository.findByPedidoId(order.getId());
+            List<OrdenItems> items = ordenItemsRepository.findByOrderId(order.getId());
             List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
             for (OrdenItems item : items) {
 
