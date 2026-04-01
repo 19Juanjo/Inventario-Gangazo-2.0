@@ -15,6 +15,7 @@ import com.example.InventarioGangazo2.dto.OrderRequestDTO;
 import com.example.InventarioGangazo2.dto.OrderResponseDTO;
 import com.example.InventarioGangazo2.service.ShoppingService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +25,7 @@ public class OrderController {
     private final ShoppingService shoppingService;
 
     @PostMapping("/buy")
-    public ResponseEntity<OrderResponseDTO> buy(@RequestBody OrderRequestDTO request) {
+    public ResponseEntity<OrderResponseDTO> buy(@Valid @RequestBody OrderRequestDTO request) {
 
         if (request == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -43,7 +44,7 @@ public class OrderController {
     }
 
     @GetMapping("/history/{userId}")
-    public ResponseEntity<List<OrderResponseDTO>> Purchasehistory(@PathVariable Long userId) {
+    public ResponseEntity<List<OrderResponseDTO>> Purchasehistory(@Valid @PathVariable Long userId) {
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
