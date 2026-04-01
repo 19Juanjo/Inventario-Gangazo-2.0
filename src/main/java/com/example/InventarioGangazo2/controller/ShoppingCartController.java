@@ -10,6 +10,7 @@ import com.example.InventarioGangazo2.entity.Users;
 import com.example.InventarioGangazo2.repository.UsersRepository;
 import com.example.InventarioGangazo2.service.ShoppingCartService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,7 +21,7 @@ public class ShoppingCartController {
     private final UsersRepository usersRepository;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ShoppingCartResponseDTO> getCart(@PathVariable Long userId){
+    public ResponseEntity<ShoppingCartResponseDTO> getCart(@Valid @PathVariable Long userId){
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -34,7 +35,7 @@ public class ShoppingCartController {
     }
     
     @PostMapping("/{userId}")
-    public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Long userId, @RequestBody ShoppingCartItemRequestDTO request) {
+    public ResponseEntity<ShoppingCartResponseDTO> addProduct(@Valid @PathVariable Long userId, @RequestBody ShoppingCartItemRequestDTO request) {
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -60,7 +61,7 @@ public class ShoppingCartController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<ShoppingCartResponseDTO> updateProduct(@PathVariable Long userId,@RequestBody ShoppingCartItemRequestDTO request) {
+    public ResponseEntity<ShoppingCartResponseDTO> updateProduct(@Valid @PathVariable Long userId,@RequestBody ShoppingCartItemRequestDTO request) {
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -86,7 +87,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@PathVariable Long userId,@PathVariable Long productId) {
+    public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@Valid @PathVariable Long userId,@PathVariable Long productId) {
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -104,7 +105,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping("/clear/{userId}")
-    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
+    public ResponseEntity<Void> clearCart(@Valid @PathVariable Long userId) {
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

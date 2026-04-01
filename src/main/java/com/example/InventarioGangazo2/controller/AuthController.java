@@ -12,6 +12,7 @@ import com.example.InventarioGangazo2.dto.RegisterRequestDTO;
 import com.example.InventarioGangazo2.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,7 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<MessageResponseDTO> register(@RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<MessageResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
 
         if (request == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Empty request"));
@@ -51,7 +52,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
         if (request == null) {
             LoginResponseDTO error = new LoginResponseDTO();
@@ -82,7 +83,7 @@ public class AuthController {
     }
 
     @GetMapping("/refreshToken")
-    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(HttpServletRequest request) {
+    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@Valid HttpServletRequest request) {
 
         String authHeader = request.getHeader("Authorization");
 
