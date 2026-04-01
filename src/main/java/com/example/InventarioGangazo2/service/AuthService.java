@@ -41,7 +41,7 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRol_id(RolType.CLIENTE.getId());
+        user.setRolId(RolType.CLIENTE.getId());
 
         usersRepository.save(user);
 
@@ -71,7 +71,7 @@ public class AuthService {
         String jwt = jwtService.generateToken(
                 userFound.getId(),
                 userFound.getUsername(),
-                userFound.getRol_id()
+                userFound.getRolId()
         );
 
         LoginResponseDTO response = new LoginResponseDTO();
