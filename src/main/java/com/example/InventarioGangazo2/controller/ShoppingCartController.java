@@ -105,7 +105,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping("/clear/{userId}")
-    public ResponseEntity<Void> clearCart(@Valid @PathVariable Long userId) {
+    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
 
         if (userId == null || userId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
