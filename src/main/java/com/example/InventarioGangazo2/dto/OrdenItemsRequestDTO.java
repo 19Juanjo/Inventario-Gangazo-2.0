@@ -10,5 +10,5 @@ public class OrdenItemsRequestDTO {
     private Long productId;
     @NotNull(message = "The quantity is required")
     @Positive(message = "the quantity must be greater than 0")
-    private Integer Quantity;
+    private Integer quantity;
 }

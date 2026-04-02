@@ -17,6 +17,7 @@ import com.example.InventarioGangazo2.repository.ProductsRepository;
 import com.example.InventarioGangazo2.repository.ShoppingCartItemRepository;
 import com.example.InventarioGangazo2.repository.ShoppingCartRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -150,6 +151,7 @@ public class ShoppingCartService {
         return buildResponse(cart);        
     }
 
+    @Transactional
     public void clearCart(Users user) {
         if (user == null) {
             throw new RuntimeException("User is required");
