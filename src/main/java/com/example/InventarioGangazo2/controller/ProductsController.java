@@ -11,8 +11,10 @@ import com.example.InventarioGangazo2.dto.MessageResponseDTO;
 import com.example.InventarioGangazo2.dto.ProductsRequestDTO;
 import com.example.InventarioGangazo2.dto.ProductsResponseDTO;
 import com.example.InventarioGangazo2.entity.Products;
+import com.example.InventarioGangazo2.service.JwtService;
 import com.example.InventarioGangazo2.service.ProductsService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductsController {
 
     private final ProductsService productsService;
+    private final JwtService jwtService;
 
     @GetMapping
     public ResponseEntity<List<ProductsResponseDTO>> AllProducts() {
@@ -45,9 +48,15 @@ public class ProductsController {
         return ResponseEntity.ok(productsService.getById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Optional<Products>> create(@Valid @RequestBody ProductsRequestDTO product) {
 
+    @PostMapping
+    public ResponseEntity<Optional<Products>> create(@Valid @RequestBody ProductsRequestDTO product, HttpServletRequest request) {
+
+        Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
+        if (role != 1L) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
+        }
+        
         if (product == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
         }
@@ -68,7 +77,12 @@ public class ProductsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Optional<ProductsResponseDTO>> update(@Valid @PathVariable Long id,@RequestBody ProductsRequestDTO dto) {
+    public ResponseEntity<Optional<ProductsResponseDTO>> update(@Valid @PathVariable Long id,@RequestBody ProductsRequestDTO dto, HttpServletRequest request) {
+
+        Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
+        if (role != 1L) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
+        }
 
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
@@ -86,8 +100,13 @@ public class ProductsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> delete(@Valid @PathVariable Long id) {
+    public ResponseEntity<MessageResponseDTO> delete(@Valid @PathVariable Long id, HttpServletRequest request) {
 
+        Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
+        if (role != 1L) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MessageResponseDTO("Access denied"));
+        }
+        
         if (id == null || id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Invalid ID"));
         }
