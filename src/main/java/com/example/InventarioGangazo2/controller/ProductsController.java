@@ -56,7 +56,7 @@ public class ProductsController {
         if (role != 1L) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
         }
-        
+
         if (product == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
         }
