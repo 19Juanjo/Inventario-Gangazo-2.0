@@ -39,10 +39,6 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        if (request.getItems() == null || request.getItems().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
         OrderResponseDTO response = shoppingService.MakePurchase(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
