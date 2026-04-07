@@ -13,9 +13,15 @@ import com.example.InventarioGangazo2.dto.OrderResponseDTO;
 import com.example.InventarioGangazo2.entity.OrdenItems;
 import com.example.InventarioGangazo2.entity.Order;
 import com.example.InventarioGangazo2.entity.Products;
+import com.example.InventarioGangazo2.entity.ShoppingCart;
+import com.example.InventarioGangazo2.entity.ShoppingCartItem;
+import com.example.InventarioGangazo2.entity.Users;
 import com.example.InventarioGangazo2.repository.OrdenItemsRepository;
 import com.example.InventarioGangazo2.repository.OrderRepository;
 import com.example.InventarioGangazo2.repository.ProductsRepository;
+import com.example.InventarioGangazo2.repository.ShoppingCartItemRepository;
+import com.example.InventarioGangazo2.repository.ShoppingCartRepository;
+import com.example.InventarioGangazo2.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,63 +31,70 @@ public class ShoppingService {
     private final OrdenItemsRepository ordenItemsRepository;
     private final OrderRepository orderRepository;
     private final ProductsRepository productsRepository;
+    private final UsersRepository usersRepository;
+    private final ShoppingCartRepository shoppingCartRepository;
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
+    private final ShoppingCartService shoppingCartService;
 
-     public OrderResponseDTO Makepurchase(OrderRequestDTO request) {
+    public OrderResponseDTO MakePurchase(OrderRequestDTO request) {
         if (request.getUserId() == null) {
             throw new RuntimeException("User is required");
         }
-        if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("Order must contain at least one item");
+        Users user = usersRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ShoppingCart cart = shoppingCartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart not found or empty"));
+
+        List<ShoppingCartItem> cartItems = shoppingCartItemRepository.findByShoppingCart(cart);
+
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new RuntimeException("Cart is empty");
         }
 
         Order order = new Order();
         order.setDate(new Timestamp(System.currentTimeMillis()));
         order.setTotal(0.0);
         order.setUserId(request.getUserId());
-
         order = orderRepository.save(order);
 
-        double total = 0;   
+        double total = 0;
         List<OrdenItemsResponseDTO> itemsResponse = new ArrayList<>();
 
-        for (OrdenItemsRequestDTO item : request.getItems()) {
-            if (item.getProductId() == null) {
-                throw new RuntimeException("Product is required");
-            }
-            if (item.getQuantity() <= 0) {
-                throw new RuntimeException("Quantity must be greater than 0");
-            }
-            Products product = productsRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+        for (ShoppingCartItem cartItem : cartItems) {
+            Products product = cartItem.getProduct();
 
-            if (product.getStock() < item.getQuantity()) {
-                throw new RuntimeException("Insufficient stock");
+            if (product == null) {
+                throw new RuntimeException("Product not found in cart item");
+            }
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for product: " + product.getName());
             }
 
-            product.setStock(product.getStock() - item.getQuantity());
+            product.setStock(product.getStock() - cartItem.getQuantity());
             productsRepository.save(product);
 
             OrdenItems orderItem = new OrdenItems();
             orderItem.setOrderId(order.getId());
             orderItem.setProductId(product.getId());
-            orderItem.setQuantity(item.getQuantity());
+            orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(product.getPrice());
-
             ordenItemsRepository.save(orderItem);
 
-            total += product.getPrice() * item.getQuantity();
+            total += product.getPrice() * cartItem.getQuantity();
 
             OrdenItemsResponseDTO itemResponse = new OrdenItemsResponseDTO();
             itemResponse.setProductId(product.getId());
             itemResponse.setName(product.getName());
-            itemResponse.setQuantity(item.getQuantity());
+            itemResponse.setQuantity(cartItem.getQuantity());
             itemResponse.setPrice(product.getPrice());
-
-            itemsResponse.add(itemResponse); 
+            itemsResponse.add(itemResponse);
         }
 
         order.setTotal(total);
         orderRepository.save(order);
+
+        shoppingCartService.clearCart(user);
 
         OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
