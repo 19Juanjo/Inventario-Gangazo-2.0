@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.InventarioGangazo2.dto.OrdenItemsRequestDTO;
 import com.example.InventarioGangazo2.dto.OrdenItemsResponseDTO;
 import com.example.InventarioGangazo2.dto.OrderRequestDTO;
 import com.example.InventarioGangazo2.dto.OrderResponseDTO;
@@ -36,6 +35,11 @@ public class ShoppingService {
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final ShoppingCartService shoppingCartService;
 
+    /**
+     * 
+     * @param request the DTO containing the user ID
+     * @return {@link OrderResponseDTO} with the order details and items
+     */
     public OrderResponseDTO MakePurchase(OrderRequestDTO request) {
         if (request.getUserId() == null) {
             throw new RuntimeException("User is required");
@@ -104,7 +108,11 @@ public class ShoppingService {
 
         return response;
     }
-
+    /**
+     * 
+     * @param userId the ID of the user
+     * @return list of {@link OrderResponseDTO}, empty list if no orders exist
+     */
     public List<OrderResponseDTO> Purchasehistory(Long userId) {
         if (userId == null) {
             throw new RuntimeException("User is required");
@@ -138,7 +146,10 @@ public class ShoppingService {
         }
         return responseList;
     }
-
+    /**
+     * 
+     * @return list of {@link OrderResponseDTO}, empty list if no orders exist
+     */
     public List<OrderResponseDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
         List<OrderResponseDTO> responseList = new ArrayList<>();

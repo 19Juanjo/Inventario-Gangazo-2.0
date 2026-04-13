@@ -26,7 +26,11 @@ public class ShoppingCartService {
         private final ShoppingCartRepository shoppingCartRepository;
         private final ShoppingCartItemRepository shoppingCartItemRepository;
         private final ProductsRepository productsRepository;
-
+    /**
+     * 
+     * @param user the authenticated user
+     * @return {@link Optional} with the user's {@link ShoppingCartResponseDTO}
+     */
     public Optional<ShoppingCartResponseDTO> getCartByUser(Users user) {
 
         if (user == null) {
@@ -42,7 +46,12 @@ public class ShoppingCartService {
 
         return buildResponse(cart);
     }
-
+    /**
+     * 
+     * @param user the authenticated user
+     * @param request the DTO containing productId and quantity
+     * @return {@link Optional} with the updated {@link ShoppingCartResponseDTO}
+     */
     public Optional<ShoppingCartResponseDTO> addProduct(Users user, ShoppingCartItemRequestDTO request){
 
         if (user == null) {
@@ -89,7 +98,12 @@ public class ShoppingCartService {
 
         return buildResponse(cart);
     }
-
+    /**
+     * 
+     * @param user the authenticated user
+     * @param request the DTO containing productId and new quantity
+     * @return {@link Optional} with the updated {@link ShoppingCartResponseDTO}
+     */
     public Optional<ShoppingCartResponseDTO> updateCart(Users user, ShoppingCartItemRequestDTO request){
 
         if (user == null) {
@@ -126,7 +140,12 @@ public class ShoppingCartService {
 
         return buildResponse(cart);
     }
-
+    /**
+     * 
+     * @param user the authenticated user
+     * @param productId the ID of the product to remove
+     * @return {@link Optional} with the updated {@link ShoppingCartResponseDTO}
+     */
     public Optional<ShoppingCartResponseDTO> removeProduct(Users user, Long productId){
 
         if (user == null) {
@@ -150,7 +169,10 @@ public class ShoppingCartService {
 
         return buildResponse(cart);        
     }
-
+    /**
+     *  
+     * @param user the authenticated user
+     */
     @Transactional
     public void clearCart(Users user) {
         if (user == null) {
@@ -161,7 +183,11 @@ public class ShoppingCartService {
 
         shoppingCartItemRepository.deleteByShoppingCart(cart);
     }
-
+    /**
+     * 
+     * @param cart the shopping cart entity
+     * @return {@link Optional} with the mapped response DTO including items and total
+     */
     private Optional<ShoppingCartResponseDTO> buildResponse(ShoppingCart cart) {
 
         List<ShoppingCartItem> items = shoppingCartItemRepository.findByShoppingCart(cart);

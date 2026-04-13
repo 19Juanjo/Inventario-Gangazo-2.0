@@ -25,97 +25,93 @@ public class ProductsController {
 
     private final ProductsService productsService;
     private final JwtService jwtService;
-
+    /**
+     * 
+     * @return 200 OK with the list of products, or 204 NO CONTENT if empty
+     */
     @GetMapping
     public ResponseEntity<List<ProductsResponseDTO>> AllProducts() {
-
-        List<ProductsResponseDTO> response = productsService.AllProducts();
-
-        if (response == null || response.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        try {
+            List<ProductsResponseDTO> response = productsService.AllProducts();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        return ResponseEntity.ok(response);
     }
-
+    /**
+     * 
+     * @param id the product ID, must be positive
+     * @return 200 OK with the product, or 404 NOT FOUND if it does not exist
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Optional<ProductsResponseDTO>> getById(@Valid @PathVariable Long id) {
-
-        if (id == null || id <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
+        try {
+            return ResponseEntity.ok(productsService.getById(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        return ResponseEntity.ok(productsService.getById(id));
     }
-
-
+    /**
+     * 
+     * @param product the DTO containing the product data
+     * @param request this httpServeletRequest
+     * @return 201 CREATED with the new product, or 400 BAD REQUEST if validation fails
+     */
     @PostMapping
     public ResponseEntity<Optional<Products>> create(@Valid @RequestBody ProductsRequestDTO product, HttpServletRequest request) {
-
-        Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
-        if (role != 1L) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
+        try {
+            Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
+            if (role != 1L) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(productsService.add(product));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        if (product == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        if (product.getName() == null || product.getName().isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        if (product.getPrice() == null || product.getPrice() <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        if (product.getStock() == null || product.getStock() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(productsService.add(product));
     }
-
+    /**
+     * 
+     * @param id the product ID, must be positive
+     * @param dto the DTO containing the updated product data
+     * @param request this httpServeletRequest
+     * @return 200 OK with the updated product, or 404 NOT FOUND if it does not exist
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Optional<ProductsResponseDTO>> update(@Valid @PathVariable Long id,@RequestBody ProductsRequestDTO dto, HttpServletRequest request) {
-
-        Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
-        if (role != 1L) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
+        try {
+            Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
+            if (role != 1L) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Optional.empty());
+            }
+            return ResponseEntity.ok(productsService.update(id, dto));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        if (id == null || id <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        if (dto == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        if (dto.getName() == null || dto.getName().isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Optional.empty());
-        }
-
-        return ResponseEntity.ok(productsService.update(id, dto));
     }
-
+    /**
+     * 
+     * @param id the product ID, must be positive
+     * @param request this httpServeletRequest
+     * @return 200 OK with a success message, or 404 NOT FOUND if it does not exist
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> delete(@Valid @PathVariable Long id, HttpServletRequest request) {
-
-        Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
-        if (role != 1L) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MessageResponseDTO("Access denied"));
+        try {
+            Long role = jwtService.extractRolId(request.getHeader("Authorization").substring(7));
+            if (role != 1L) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new MessageResponseDTO("Access denied"));
+            }
+            productsService.delete(id);
+            MessageResponseDTO response = new MessageResponseDTO();
+            response.setMessage("Product delete correctly");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        
-        if (id == null || id <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Invalid ID"));
-        }
-
-        productsService.delete(id);
-
-        MessageResponseDTO response = new MessageResponseDTO();
-        response.setMessage("Product delete correctly");
-
-        return ResponseEntity.ok(response);
     }
 }
