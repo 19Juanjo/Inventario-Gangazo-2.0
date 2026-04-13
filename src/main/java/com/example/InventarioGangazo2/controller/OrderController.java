@@ -1,7 +1,6 @@
 package com.example.InventarioGangazo2.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,33 +26,41 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
     private final ShoppingService shoppingService;
     private final JwtService jwtService;
-
+    /**
+     *  
+     * @param request the DTO containing the user ID
+     * @return 200 OK with the order details, or 400 BAD REQUEST if the cart is empty
+     */
     @PostMapping("/buy")
     public ResponseEntity<OrderResponseDTO> buy(@Valid @RequestBody OrderRequestDTO request) {
-
-        if (request == null) {
+        try {
+            OrderResponseDTO response = shoppingService.MakePurchase(request);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        if (request.getUserId() == null || request.getUserId() <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        OrderResponseDTO response = shoppingService.MakePurchase(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
+    /**
+     * 
+     * @param userId the user ID, must be positive
+     * @return 200 OK with the list of orders, or 204 NO CONTENT if empty
+     */
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<OrderResponseDTO>> Purchasehistory(@Valid @PathVariable Long userId) {
-
-        if (userId == null || userId <= 0) {
+        try {
+            List<OrderResponseDTO> response = shoppingService.Purchasehistory(userId);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        List<OrderResponseDTO> response = shoppingService.Purchasehistory(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
+    /**
+     * 
+     * @param request this httpServeletRequest
+     * @return 200 OK the getAllOrders
+     */
     @GetMapping("/admin")
     public ResponseEntity<List<OrderResponseDTO>> getAllOrders(HttpServletRequest request) {
 

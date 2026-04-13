@@ -19,28 +19,14 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
-
+    /**
+     * 
+     * @param request the DTO containing username, email and password
+     * @return 201 CREATED with a success message, or 400 BAD REQUEST if validation fails
+     */
     @PostMapping("/register")
     public ResponseEntity<MessageResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
-
-        if (request == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Empty request"));
-        }
-
-        if (request.getUsername() == null || request.getUsername().isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("The username is required."));
-        }
-
-        if (request.getEmail() == null || request.getEmail().isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("Email is required"));
-        }
-
-        if (request.getPassword() == null || request.getPassword().length() < 6) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO("The password must be at least 6 characters long"));
-        }
-
         try {
             MessageResponseDTO response = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -50,28 +36,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
-
+    /**
+     * 
+     * @param request the DTO containing username and password
+     * @return 200 OK with a JWT token, or 401 UNAUTHORIZED if credentials are invalid
+     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
-
-        if (request == null) {
-            LoginResponseDTO error = new LoginResponseDTO();
-            error.setMessage("Request empty");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-
-        if (request.getUsername() == null || request.getUsername().isBlank()) {
-            LoginResponseDTO error = new LoginResponseDTO();
-            error.setMessage("the username is required");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-
-        if (request.getPassword() == null || request.getPassword().isBlank()) {
-            LoginResponseDTO error = new LoginResponseDTO();
-            error.setMessage("the password is required");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-
         try {
             LoginResponseDTO response = authService.login(request);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -81,7 +52,11 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
-
+    /**
+     * 
+     * @param request the HTTP request containing the Bearer token in the Authorization header
+     * @return 200 OK with a new JWT token, or 401 UNAUTHORIZED if the token is invalid or expired
+     */
     @GetMapping("/refreshToken")
     public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@Valid HttpServletRequest request) {
 

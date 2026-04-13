@@ -18,21 +18,29 @@ public class ProductsService {
 
     private final ProductsRepository productsRepository;
 
+    /**
+     * 
+     * @return list of {@link ProductsResponseDTO}, empty list if no products exist
+     */
     public List<ProductsResponseDTO> AllProducts() {
         return productsRepository.findAll()
             .stream()
             .map(p -> {
                 ProductsResponseDTO dto = new ProductsResponseDTO();
                 dto.setId(p.getId());
-                dto.setNombre(p.getName());
-                dto.setDescripcion(p.getDescription());
-                dto.setPrecio(p.getPrice());
+                dto.setName(p.getName());
+                dto.setDescription(p.getDescription());
+                dto.setPrice(p.getPrice());
                 dto.setStock(p.getStock());
                 return dto;
             })
             .toList();
     }
-
+    /**
+     * 
+     * @param product the DTO containing the product data
+     * @return {@link Optional} with the saved {@link Products} entity
+     */
     public Optional<Products> add(ProductsRequestDTO product) {
 
         if (product.getName() == null || product.getName().isBlank()) {
@@ -56,7 +64,10 @@ public class ProductsService {
 
         return Optional.of(productsRepository.save(p));
     }
-
+    /**
+     * 
+     * @param id the product ID, must be positive
+     */
     public void delete(Long id) {
         if (id == null) {
             throw new RuntimeException("the id is required");
@@ -66,7 +77,12 @@ public class ProductsService {
         }
         productsRepository.deleteById(id);
     }
-
+    /**
+     * 
+     * @param id the product ID, must be positive
+     * @param dto the DTO containing the updated product data
+     * @return {@link Optional} with the updated {@link ProductsResponseDTO}
+     */
     public Optional<ProductsResponseDTO> update(Long id, ProductsRequestDTO dto) {
         if (id == null) {
             throw new RuntimeException("the id is required");
@@ -98,16 +114,20 @@ public class ProductsService {
 
             ProductsResponseDTO response = new ProductsResponseDTO();
             response.setId(productUpdate.getId());
-            response.setNombre(productUpdate.getName());
-            response.setDescripcion(productUpdate.getDescription());
-            response.setPrecio(productUpdate.getPrice());
+            response.setName(productUpdate.getName());
+            response.setDescription(productUpdate.getDescription());
+            response.setPrice(productUpdate.getPrice());
             response.setStock(productUpdate.getStock());
 
             return Optional.of(response);
         }
         return Optional.empty();
     }
-
+    /**
+     * 
+     * @param id the product ID, must be positive
+     * @return {@link Optional} with the {@link ProductsResponseDTO} if found
+     */
     public Optional<ProductsResponseDTO> getById(Long id) {
         if (id == null) {
             throw new RuntimeException("the id is required");
@@ -118,9 +138,9 @@ public class ProductsService {
 
             ProductsResponseDTO response = new ProductsResponseDTO();
             response.setId(p.getId());
-            response.setNombre(p.getName());
-            response.setDescripcion(p.getDescription());
-            response.setPrecio(p.getPrice());
+            response.setName(p.getName());
+            response.setDescription(p.getDescription());
+            response.setPrice(p.getPrice());
             response.setStock(p.getStock());
 
             return Optional.of(response);
