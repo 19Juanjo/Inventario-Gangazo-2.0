@@ -23,7 +23,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UsersRepository usersRepository;
     private final JwtService jwtService;
-
+    /**
+     * 
+     * @param request the DTO containing username, email and password 
+     * @return with a success message
+    */
     public MessageResponseDTO register(RegisterRequestDTO request) {
         MessageResponseDTO response = new MessageResponseDTO();
 
@@ -48,7 +52,11 @@ public class AuthService {
         response.setMessage("User successfully registered");
         return response;
     }
-
+    /**
+     * 
+     * @param request the DTO containing username and password
+     * @return with a success message and JWT token
+     */
     public LoginResponseDTO login(LoginRequestDTO request) {
 
         if (request.getUsername() == null || request.getUsername().isBlank() ||
@@ -81,6 +89,11 @@ public class AuthService {
         return response;
     }
 
+    /**
+     * 
+     * @param token the current JWT token to refresh
+     * @return with a success message and new JWT token
+     */
     public RefreshTokenResponseDTO refreshToken(String token) {
         String jwt = jwtService.refreshToken(token);
 
